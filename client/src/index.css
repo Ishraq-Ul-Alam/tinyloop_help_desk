@@ -267,17 +267,17 @@ textarea {
 }
 
 /* Priority Colors */
-.priority.high {
+.priority.p1 {
   background: #fee2e2;
   color: #b91c1c;
 }
 
-.priority.medium {
+.priority.p2 {
   background: #fef3c7;
   color: #b45309;
 }
 
-.priority.low {
+.priority.p3 {
   background: #dcfce7;
   color: #15803d;
 }
@@ -341,4 +341,130 @@ textarea {
     flex-direction: column;
     align-items: flex-start;
   }
+  .form-message {
+  margin-top: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #2563eb;
+}
+.ticket-category {
+  margin: 8px 0 0;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+.resolve-btn {
+  margin-left: 10px;
+  padding: 8px 12px;
+  border: none;
+  background: #10b981;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.resolve-btn:hover {
+  background: #059669;
+}
+html {
+  scroll-behavior: smooth;
+}
+
+.primary-btn,
+.secondary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.ticket-category {
+  margin: 8px 0 0;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.ticket-desc {
+  margin-top: 6px;
+  color: #9ca3af;
+  font-size: 0.85rem;
+}
+
+.priority.p1 {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.priority.p2 {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.priority.p3 {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.status.pending {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.resolve-btn {
+  margin-left: 10px;
+  padding: 8px 12px;
+  border: none;
+  background: #10b981;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.resolve-btn:hover {
+  background: #059669;
+}
+.filter-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filters {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  background: white;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.filter-btn:hover {
+  background: #f3f4f6;
+}
+
+.filter-btn.active {
+  background: #2563eb;
+  color: white;
+  border-color: #2563eb;
+}
+
+.search-input {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  min-width: 220px;
+}
 }
