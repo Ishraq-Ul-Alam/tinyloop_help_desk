@@ -9,18 +9,17 @@ const app = express();
 
 connectDB();
 
-
-
 app.use(
   cors({
     origin: [
       "http://localhost:5173",
       "https://tinyloop-help-desk.vercel.app",
     ],
-    methods: ["GET", "POST", "PUT"],
+    methods: ["GET", "POST", "PUT", "OPTIONS"],
     credentials: true,
   })
 );
+
 app.use(express.json());
 
 const PORT = process.env.PORT || 5001;
@@ -33,17 +32,16 @@ app.get("/api/test", (req, res) => {
   res.json({ message: "API working" });
 });
 
-// GET all tickets from MongoDB
 app.get("/api/tickets", async (req, res) => {
   try {
     const tickets = await Ticket.find().sort({ createdAt: -1 });
     res.json(tickets);
   } catch (error) {
+    console.error("Error fetching tickets:", error.message);
     res.status(500).json({ message: "Failed to fetch tickets" });
   }
 });
 
-// POST new ticket to MongoDB
 app.post("/api/tickets", async (req, res) => {
   try {
     const { title, category, urgency, description } = req.body;
@@ -62,8 +60,6 @@ app.post("/api/tickets", async (req, res) => {
       status: urgency === "High" ? "Open" : "Pending",
     });
 
-    console.log("New Ticket Saved:", ticket);
-
     res.status(201).json({
       message: "Ticket created successfully",
       ticket,
@@ -74,9 +70,6 @@ app.post("/api/tickets", async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
 app.put("/api/tickets/:id", async (req, res) => {
   try {
     const { status } = req.body;
@@ -99,4 +92,8 @@ app.put("/api/tickets/:id", async (req, res) => {
     console.error("Error updating ticket:", error.message);
     res.status(500).json({ message: "Failed to update ticket" });
   }
+});
+
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server running on port ${PORT}`);
 });
