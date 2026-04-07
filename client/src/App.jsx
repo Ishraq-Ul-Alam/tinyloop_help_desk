@@ -35,7 +35,6 @@ function App() {
       setMessage("");
 
       const res = await fetch(`${API_BASE}/api/tickets`);
-
       if (!res.ok) {
         throw new Error(`Failed with status ${res.status}`);
       }
@@ -190,235 +189,292 @@ function App() {
     [tickets]
   );
 
-  const chartColors = ["#2563eb", "#f59e0b", "#10b981"];
+  const pieColors = ["#2563eb", "#f59e0b", "#10b981"];
 
   return (
-    <div className="app">
-      <nav className="navbar">
-        <div className="logo">SupportFlow</div>
-        <div className="nav-links">
-          <a href="#dashboard">Dashboard</a>
-          <a href="#create">Create</a>
-          <a href="#tickets">Tickets</a>
+    <div className="page">
+      <nav className="topbar">
+        <div className="brand">SupportFlow</div>
+        <div className="topbar-links">
+          <a href="#overview">Overview</a>
+          <a href="#create-ticket">Create</a>
+          <a href="#ticket-board">Tickets</a>
           <a href="#reports">Reports</a>
         </div>
       </nav>
 
-      <header className="hero">
-        <div className="hero-text">
-          <h1>Smart Helpdesk System</h1>
-          <p>Track, manage, resolve, and report on tickets easily.</p>
+      <main className="container">
+        <section className="hero-panel">
+          <div className="hero-copy">
+            <div className="eyebrow">FULL-STACK HELPDESK DEMO</div>
+            <h1>Modern ticket management for support teams.</h1>
+            <p>
+              Create, track, resolve, search, filter, and analyse tickets
+              through a clean SaaS-style dashboard built with React, Express,
+              MongoDB, and charts.
+            </p>
 
-          <div className="hero-actions">
-            <a href="#create" className="primary-btn">
-              Create Ticket
-            </a>
-            <a href="#reports" className="secondary-btn">
-              View Reports
-            </a>
+            <div className="hero-cta">
+              <a href="#create-ticket" className="btn btn-primary">
+                Create Ticket
+              </a>
+              <a href="#reports" className="btn btn-secondary">
+                View Reports
+              </a>
+            </div>
           </div>
-        </div>
 
-        <div className="hero-card" id="create">
-          <h3>Create Ticket</h3>
+          <div className="hero-side">
+            <div className="mini-stat-grid">
+              <div className="mini-stat">
+                <span>Total</span>
+                <strong>{tickets.length}</strong>
+              </div>
+              <div className="mini-stat">
+                <span>Open</span>
+                <strong>{tickets.filter((t) => t.status === "Open").length}</strong>
+              </div>
+              <div className="mini-stat">
+                <span>Pending</span>
+                <strong>{tickets.filter((t) => t.status === "Pending").length}</strong>
+              </div>
+              <div className="mini-stat">
+                <span>Resolved</span>
+                <strong>{tickets.filter((t) => t.status === "Resolved").length}</strong>
+              </div>
+            </div>
+          </div>
+        </section>
 
-          <input
-            name="title"
-            placeholder="Title"
-            value={formData.title}
-            onChange={handleChange}
-          />
+        <section className="dashboard-grid" id="overview">
+          <div className="panel create-panel" id="create-ticket">
+            <div className="panel-header">
+              <div>
+                <h2>Create Ticket</h2>
+                <p>Log a new issue quickly.</p>
+              </div>
+            </div>
 
-          <select
-            name="category"
-            value={formData.category}
-            onChange={handleChange}
-          >
-            <option value="">Category</option>
-            <option value="Network">Network</option>
-            <option value="Hardware">Hardware</option>
-            <option value="Software">Software</option>
-            <option value="Access">Access</option>
-          </select>
+            <div className="form-layout">
+              <input
+                name="title"
+                placeholder="Issue title"
+                value={formData.title}
+                onChange={handleChange}
+              />
 
-          <select
-            name="urgency"
-            value={formData.urgency}
-            onChange={handleChange}
-          >
-            <option value="">Urgency</option>
-            <option value="High">High</option>
-            <option value="Medium">Medium</option>
-            <option value="Low">Low</option>
-          </select>
+              <div className="form-row">
+                <select
+                  name="category"
+                  value={formData.category}
+                  onChange={handleChange}
+                >
+                  <option value="">Category</option>
+                  <option value="Network">Network</option>
+                  <option value="Hardware">Hardware</option>
+                  <option value="Software">Software</option>
+                  <option value="Access">Access</option>
+                </select>
 
-          <textarea
-            name="description"
-            placeholder="Description"
-            value={formData.description}
-            onChange={handleChange}
-            rows="5"
-          />
+                <select
+                  name="urgency"
+                  value={formData.urgency}
+                  onChange={handleChange}
+                >
+                  <option value="">Urgency</option>
+                  <option value="High">High</option>
+                  <option value="Medium">Medium</option>
+                  <option value="Low">Low</option>
+                </select>
+              </div>
 
-          <button
-            className="primary-btn"
-            onClick={handleSubmit}
-            disabled={submitting}
-          >
-            {submitting ? "Submitting..." : "Submit"}
-          </button>
+              <textarea
+                name="description"
+                placeholder="Describe the issue"
+                value={formData.description}
+                onChange={handleChange}
+                rows="6"
+              />
 
-          {message && <p className="form-message">{message}</p>}
-        </div>
-      </header>
-
-      <section id="dashboard" className="stats-grid">
-        <div className="stat-card">
-          <p>Total Tickets</p>
-          <h2>{tickets.length}</h2>
-        </div>
-        <div className="stat-card">
-          <p>Open</p>
-          <h2>{tickets.filter((t) => t.status === "Open").length}</h2>
-        </div>
-        <div className="stat-card">
-          <p>Pending</p>
-          <h2>{tickets.filter((t) => t.status === "Pending").length}</h2>
-        </div>
-        <div className="stat-card">
-          <p>Resolved</p>
-          <h2>{tickets.filter((t) => t.status === "Resolved").length}</h2>
-        </div>
-      </section>
-
-      <section id="tickets" className="tickets-section">
-        <div className="section-header">
-          <h2>Tickets</h2>
-        </div>
-
-        <div className="toolbar">
-          <div className="filters">
-            {["All", "Open", "Pending", "Resolved"].map((status) => (
               <button
-                key={status}
-                className={`filter-btn ${filter === status ? "active" : ""}`}
-                onClick={() => setFilter(status)}
+                className="btn btn-primary full"
+                onClick={handleSubmit}
+                disabled={submitting}
               >
-                {status}
+                {submitting ? "Submitting..." : "Submit Ticket"}
               </button>
-            ))}
+
+              {message && <div className="notice">{message}</div>}
+            </div>
           </div>
 
-          <input
-            className="search-input"
-            placeholder="Search by title..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
+          <div className="panel stats-panel">
+            <div className="panel-header">
+              <div>
+                <h2>Overview</h2>
+                <p>Live ticket summary.</p>
+              </div>
+            </div>
 
-        {loading ? (
-          <div className="empty-state">
-            Loading tickets. If you are using free Render, the server may take a few seconds to wake up.
+            <div className="stats-cards">
+              <div className="stat-box">
+                <span>Total Tickets</span>
+                <strong>{tickets.length}</strong>
+              </div>
+              <div className="stat-box">
+                <span>Open</span>
+                <strong>{tickets.filter((t) => t.status === "Open").length}</strong>
+              </div>
+              <div className="stat-box">
+                <span>Pending</span>
+                <strong>{tickets.filter((t) => t.status === "Pending").length}</strong>
+              </div>
+              <div className="stat-box">
+                <span>Resolved</span>
+                <strong>{tickets.filter((t) => t.status === "Resolved").length}</strong>
+              </div>
+            </div>
           </div>
-        ) : filteredTickets.length === 0 ? (
-          <div className="empty-state">No tickets found.</div>
-        ) : (
-          <div className="ticket-list">
-            {filteredTickets.map((ticket) => (
-              <div key={ticket._id} className="ticket-card">
-                <div className="ticket-main">
-                  <div className="ticket-top-row">
-                    <span className="ticket-code">
+        </section>
+
+        <section className="panel tickets-panel" id="ticket-board">
+          <div className="panel-header">
+            <div>
+              <h2>Ticket Board</h2>
+              <p>Manage tickets with search and filters.</p>
+            </div>
+          </div>
+
+          <div className="toolbar">
+            <div className="pill-group">
+              {["All", "Open", "Pending", "Resolved"].map((status) => (
+                <button
+                  key={status}
+                  className={`pill ${filter === status ? "active" : ""}`}
+                  onClick={() => setFilter(status)}
+                >
+                  {status}
+                </button>
+              ))}
+            </div>
+
+            <input
+              className="search"
+              placeholder="Search by title..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+
+          {loading ? (
+            <div className="empty-card">
+              Loading tickets. Free Render may take a few seconds to wake up.
+            </div>
+          ) : filteredTickets.length === 0 ? (
+            <div className="empty-card">No tickets found.</div>
+          ) : (
+            <div className="ticket-grid">
+              {filteredTickets.map((ticket) => (
+                <div className="ticket-item" key={ticket._id}>
+                  <div className="ticket-item-top">
+                    <span className="ticket-ref">
                       {ticket.id || ticket._id?.slice(-6).toUpperCase()}
                     </span>
-                    <span className={`tag priority ${ticket.priority?.toLowerCase()}`}>
+                    <span className={`badge-tag priority ${ticket.priority?.toLowerCase()}`}>
                       {ticket.priority}
                     </span>
                   </div>
 
                   <h3>{ticket.title}</h3>
                   <p className="ticket-category">{ticket.category}</p>
-                  <p className="ticket-desc">{ticket.description}</p>
-                </div>
+                  <p className="ticket-description">{ticket.description}</p>
 
-                <div className="ticket-side">
-                  <span
-                    className={`tag status ${ticket.status
-                      ?.toLowerCase()
-                      .replace(" ", "-")}`}
-                  >
-                    {ticket.status}
-                  </span>
-
-                  <div className="ticket-actions">
-                    {ticket.status !== "Resolved" && (
-                      <button
-                        className="resolve-btn"
-                        onClick={() => updateTicketStatus(ticket._id)}
-                      >
-                        Resolve
-                      </button>
-                    )}
-
-                    <button
-                      className="delete-btn"
-                      onClick={() => deleteTicket(ticket._id)}
+                  <div className="ticket-footer">
+                    <span
+                      className={`badge-tag status ${ticket.status
+                        ?.toLowerCase()
+                        .replace(" ", "-")}`}
                     >
-                      Delete
-                    </button>
+                      {ticket.status}
+                    </span>
+
+                    <div className="action-row">
+                      {ticket.status !== "Resolved" && (
+                        <button
+                          className="btn btn-success"
+                          onClick={() => updateTicketStatus(ticket._id)}
+                        >
+                          Resolve
+                        </button>
+                      )}
+                      <button
+                        className="btn btn-danger"
+                        onClick={() => deleteTicket(ticket._id)}
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </div>
                 </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className="reports-grid" id="reports">
+          <div className="panel chart-panel">
+            <div className="panel-header">
+              <div>
+                <h2>Status Report</h2>
+                <p>Tickets grouped by current status.</p>
               </div>
-            ))}
-          </div>
-        )}
-      </section>
+            </div>
 
-      <section id="reports" className="reports-section">
-        <div className="section-header">
-          <h2>Reports</h2>
-          <p>Live ticket insights by status and priority.</p>
-        </div>
-
-        <div className="reports-grid">
-          <div className="report-card">
-            <h3>Tickets by Status</h3>
-            <ResponsiveContainer width="100%" height={280}>
-              <BarChart data={statusData}>
-                <XAxis dataKey="name" />
-                <YAxis allowDecimals={false} />
-                <Tooltip />
-                <Bar dataKey="value" radius={[8, 8, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            <div className="chart-wrap">
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={statusData}>
+                  <XAxis dataKey="name" />
+                  <YAxis allowDecimals={false} />
+                  <Tooltip />
+                  <Bar dataKey="value" radius={[10, 10, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
 
-          <div className="report-card">
-            <h3>Tickets by Priority</h3>
-            <ResponsiveContainer width="100%" height={280}>
-              <PieChart>
-                <Pie
-                  data={priorityData}
-                  dataKey="value"
-                  nameKey="name"
-                  outerRadius={90}
-                  label
-                >
-                  {priorityData.map((entry, index) => (
-                    <Cell
-                      key={entry.name}
-                      fill={chartColors[index % chartColors.length]}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
+          <div className="panel chart-panel">
+            <div className="panel-header">
+              <div>
+                <h2>Priority Report</h2>
+                <p>Tickets grouped by priority level.</p>
+              </div>
+            </div>
+
+            <div className="chart-wrap">
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={priorityData}
+                    dataKey="value"
+                    nameKey="name"
+                    outerRadius={95}
+                    label
+                  >
+                    {priorityData.map((entry, index) => (
+                      <Cell
+                        key={entry.name}
+                        fill={pieColors[index % pieColors.length]}
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </main>
     </div>
   );
 }
