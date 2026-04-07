@@ -9,7 +9,18 @@ const app = express();
 
 connectDB();
 
-app.use(cors());
+
+
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://tinyloop-help-desk.vercel.app",
+    ],
+    methods: ["GET", "POST", "PUT"],
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 const PORT = process.env.PORT || 5001;
