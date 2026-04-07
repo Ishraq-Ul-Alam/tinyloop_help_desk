@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 
 function App() {
+  const API_BASE = "https://tinyloop-help-desk-2.onrender.com"; // replace this
+
   const [formData, setFormData] = useState({
     title: "",
     category: "",
@@ -16,12 +18,12 @@ function App() {
 
   const fetchTickets = async () => {
     try {
-      const response = await fetch("http://localhost:5001/api/tickets");
-      const data = await response.json();
+      const res = await fetch(`${API_BASE}/api/tickets`);
+      const data = await res.json();
       setTickets(data);
-    } catch (error) {
-      console.error("Error fetching tickets:", error);
-      setMessage("Failed to load tickets.");
+    } catch (err) {
+      console.error("Fetch error:", err);
+      setMessage("Failed to fetch tickets.");
     } finally {
       setLoading(false);
     }
@@ -33,11 +35,7 @@ function App() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async () => {
@@ -47,12 +45,12 @@ function App() {
       !formData.urgency ||
       !formData.description
     ) {
-      setMessage("Please fill in all fields.");
+      setMessage("Please fill all fields.");
       return;
     }
 
     try {
-      const response = await fetch("http://localhost:5001/api/tickets", {
+      const res = await fetch(`${API_BASE}/api/tickets`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -60,10 +58,10 @@ function App() {
         body: JSON.stringify(formData),
       });
 
-      const data = await response.json();
+      const data = await res.json();
 
-      setTickets((prevTickets) => [data.ticket, ...prevTickets]);
-      setMessage("Ticket submitted successfully!");
+      setTickets((prev) => [data.ticket, ...prev]);
+      setMessage("Ticket created successfully.");
 
       setFormData({
         title: "",
@@ -71,239 +69,243 @@ function App() {
         urgency: "",
         description: "",
       });
-    } catch (error) {
-      console.error("Error submitting ticket:", error);
-      setMessage("Something went wrong. Please try again.");
+    } catch (err) {
+      console.error(err);
+      setMessage("Failed to submit ticket.");
     }
   };
 
-  const updateTicketStatus = async (id, newStatus) => {
+  const updateTicketStatus = async (id) => {
     try {
-      const response = await fetch(`http://localhost:5001/api/tickets/${id}`, {
+      const res = await fetch(`${API_BASE}/api/tickets/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ status: newStatus }),
+        body: JSON.stringify({ status: "Resolved" }),
       });
 
-      const data = await response.json();
+      const data = await res.json();
 
-      setTickets((prevTickets) =>
-        prevTickets.map((ticket) =>
-          ticket._id === id ? { ...ticket, status: data.ticket.status } : ticket
+      setTickets((prev) =>
+        prev.map((t) =>
+          t._id === id ? { ...t, status: data.ticket.status } : t
         )
       );
-    } catch (error) {
-      console.error("Error updating status:", error);
+    } catch (err) {
+      console.error(err);
     }
   };
 
   const filteredTickets = tickets
-    .filter((ticket) => (filter === "All" ? true : ticket.status === filter))
-    .filter((ticket) =>
-      ticket.title.toLowerCase().includes(search.toLowerCase())
-    );
+    .filter((t) => (filter === "All" ? true : t.status === filter))
+    .filter((t) => t.title.toLowerCase().includes(search.toLowerCase()));
 
   return (
-    <div className="app">
+    <div className="app-shell">
       <nav className="navbar">
         <div className="logo">SupportFlow</div>
         <div className="nav-links">
           <a href="#dashboard">Dashboard</a>
-          <a href="#create-ticket">Create Ticket</a>
+          <a href="#create-ticket">Create</a>
           <a href="#tickets">Tickets</a>
           <a href="#reports">Reports</a>
         </div>
       </nav>
 
-      <header className="hero">
-        <div className="hero-text">
-          <p className="badge">Smart Helpdesk SaaS</p>
-          <h1>Manage support tickets faster and smarter</h1>
-          <p className="hero-subtext">
-            A modern ticketing platform with priority handling, tracking,
-            assignment logic, and a clean dashboard experience.
-          </p>
-          <div className="hero-buttons">
-            <a href="#create-ticket" className="primary-btn">
-              Create Ticket
-            </a>
-            <a href="#dashboard" className="secondary-btn">
-              View Dashboard
-            </a>
-          </div>
-        </div>
+      <main className="main-container">
+        <section className="hero-section">
+          <div className="hero-left">
+            <span className="badge">Smart Helpdesk SaaS</span>
+            <h1>Support tickets, simplified for fast-moving teams.</h1>
+            <p className="hero-description">
+              Create, track, resolve, and filter tickets through a clean full-stack
+              helpdesk workflow powered by React, Express, and MongoDB.
+            </p>
 
-        <div className="hero-card" id="create-ticket">
-          <h3>Create New Ticket</h3>
-          <form>
+            <div className="hero-actions">
+              <a href="#create-ticket" className="primary-btn">
+                Create Ticket
+              </a>
+              <a href="#tickets" className="secondary-btn">
+                View Tickets
+              </a>
+            </div>
+          </div>
+
+          <div className="hero-right" id="create-ticket">
+            <div className="form-card">
+              <div className="card-header">
+                <h2>Create a Ticket</h2>
+                <p>Log a new support issue in seconds.</p>
+              </div>
+
+              <div className="form-grid">
+                <input
+                  name="title"
+                  placeholder="Issue title"
+                  value={formData.title}
+                  onChange={handleChange}
+                />
+
+                <select
+                  name="category"
+                  value={formData.category}
+                  onChange={handleChange}
+                >
+                  <option value="">Select category</option>
+                  <option>Network</option>
+                  <option>Hardware</option>
+                  <option>Software</option>
+                  <option>Access</option>
+                </select>
+
+                <select
+                  name="urgency"
+                  value={formData.urgency}
+                  onChange={handleChange}
+                >
+                  <option value="">Select urgency</option>
+                  <option>High</option>
+                  <option>Medium</option>
+                  <option>Low</option>
+                </select>
+
+                <textarea
+                  name="description"
+                  placeholder="Describe the issue"
+                  value={formData.description}
+                  onChange={handleChange}
+                  rows="5"
+                />
+
+                <button className="primary-btn full-width" onClick={handleSubmit}>
+                  Submit Ticket
+                </button>
+
+                {message && <p className="form-message">{message}</p>}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="stats-grid" id="dashboard">
+          <div className="stat-card">
+            <p>Total Tickets</p>
+            <h3>{tickets.length}</h3>
+            <span>All recorded issues</span>
+          </div>
+          <div className="stat-card">
+            <p>Open</p>
+            <h3>{tickets.filter((t) => t.status === "Open").length}</h3>
+            <span>Needs attention</span>
+          </div>
+          <div className="stat-card">
+            <p>Pending</p>
+            <h3>{tickets.filter((t) => t.status === "Pending").length}</h3>
+            <span>Waiting on action</span>
+          </div>
+          <div className="stat-card">
+            <p>Resolved</p>
+            <h3>{tickets.filter((t) => t.status === "Resolved").length}</h3>
+            <span>Completed tickets</span>
+          </div>
+        </section>
+
+        <section className="tickets-section" id="tickets">
+          <div className="section-top">
+            <div>
+              <h2>Ticket Management</h2>
+              <p>Review, search, filter, and resolve tickets.</p>
+            </div>
+          </div>
+
+          <div className="toolbar">
+            <div className="filter-group">
+              {["All", "Open", "Pending", "Resolved"].map((status) => (
+                <button
+                  key={status}
+                  className={`filter-btn ${filter === status ? "active" : ""}`}
+                  onClick={() => setFilter(status)}
+                >
+                  {status}
+                </button>
+              ))}
+            </div>
+
             <input
               type="text"
-              name="title"
-              placeholder="Issue title"
-              value={formData.title}
-              onChange={handleChange}
+              className="search-input"
+              placeholder="Search by ticket title..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
             />
-
-            <select
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-            >
-              <option value="">Select category</option>
-              <option value="Network">Network</option>
-              <option value="Hardware">Hardware</option>
-              <option value="Software">Software</option>
-              <option value="Access">Access</option>
-            </select>
-
-            <select
-              name="urgency"
-              value={formData.urgency}
-              onChange={handleChange}
-            >
-              <option value="">Select urgency</option>
-              <option value="High">High</option>
-              <option value="Medium">Medium</option>
-              <option value="Low">Low</option>
-            </select>
-
-            <textarea
-              name="description"
-              placeholder="Describe the issue..."
-              rows="4"
-              value={formData.description}
-              onChange={handleChange}
-            ></textarea>
-
-            <button
-              type="button"
-              className="primary-btn full-width"
-              onClick={handleSubmit}
-            >
-              Submit Ticket
-            </button>
-
-            {message && <p className="form-message">{message}</p>}
-          </form>
-        </div>
-      </header>
-
-      <section className="stats-section" id="dashboard">
-        <div className="stat-card">
-          <p>Total Tickets</p>
-          <h2>{tickets.length}</h2>
-          <span>Live ticket count</span>
-        </div>
-
-        <div className="stat-card">
-          <p>Open Tickets</p>
-          <h2>{tickets.filter((ticket) => ticket.status === "Open").length}</h2>
-          <span>Needs attention</span>
-        </div>
-
-        <div className="stat-card">
-          <p>Resolved</p>
-          <h2>{tickets.filter((ticket) => ticket.status === "Resolved").length}</h2>
-          <span>Strong performance</span>
-        </div>
-
-        <div className="stat-card">
-          <p>Pending Tickets</p>
-          <h2>{tickets.filter((ticket) => ticket.status === "Pending").length}</h2>
-          <span>Waiting action</span>
-        </div>
-      </section>
-
-      <section className="tickets-section" id="tickets">
-        <div className="section-header">
-          <h2>Recent Tickets</h2>
-          <button className="secondary-btn small-btn">View All</button>
-        </div>
-
-        <div className="filter-bar">
-          <div className="filters">
-            {["All", "Open", "Pending", "Resolved"].map((status) => (
-              <button
-                key={status}
-                className={`filter-btn ${filter === status ? "active" : ""}`}
-                onClick={() => setFilter(status)}
-              >
-                {status}
-              </button>
-            ))}
           </div>
 
-          <input
-            type="text"
-            placeholder="Search tickets..."
-            className="search-input"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
+          {loading ? (
+            <div className="empty-state">Loading tickets...</div>
+          ) : filteredTickets.length === 0 ? (
+            <div className="empty-state">No tickets match your current search or filter.</div>
+          ) : (
+            <div className="ticket-list">
+              {filteredTickets.map((ticket) => (
+                <div className="ticket-card" key={ticket._id}>
+                  <div className="ticket-main">
+                    <div className="ticket-top-row">
+                      <span className="ticket-code">
+                        {ticket.id || ticket._id.slice(-6).toUpperCase()}
+                      </span>
+                      <span className={`tag priority ${ticket.priority.toLowerCase()}`}>
+                        {ticket.priority}
+                      </span>
+                    </div>
 
-        {loading ? (
-          <p className="form-message">Loading tickets...</p>
-        ) : filteredTickets.length === 0 ? (
-          <p className="form-message">No tickets match your filter or search.</p>
-        ) : (
-          <div className="ticket-list">
-            {filteredTickets.map((ticket) => (
-              <div className="ticket-card" key={ticket._id}>
-                <div>
-                  <p className="ticket-id">
-                    {ticket.id || ticket._id.slice(-6).toUpperCase()}
-                  </p>
-                  <h3>{ticket.title}</h3>
-                  <p className="ticket-category">{ticket.category}</p>
-                  <p className="ticket-desc">{ticket.description}</p>
-                </div>
+                    <h3>{ticket.title}</h3>
+                    <p className="ticket-category">{ticket.category}</p>
+                    <p className="ticket-desc">{ticket.description}</p>
+                  </div>
 
-                <div className="ticket-meta">
-                  <span className={`tag priority ${ticket.priority.toLowerCase()}`}>
-                    {ticket.priority}
-                  </span>
-
-                  <span
-                    className={`tag status ${ticket.status
-                      .toLowerCase()
-                      .replace(" ", "-")}`}
-                  >
-                    {ticket.status}
-                  </span>
-
-                  {ticket.status !== "Resolved" && (
-                    <button
-                      className="resolve-btn"
-                      onClick={() => updateTicketStatus(ticket._id, "Resolved")}
+                  <div className="ticket-side">
+                    <span
+                      className={`tag status ${ticket.status
+                        .toLowerCase()
+                        .replace(" ", "-")}`}
                     >
-                      Resolve
-                    </button>
-                  )}
+                      {ticket.status}
+                    </span>
+
+                    {ticket.status !== "Resolved" && (
+                      <button
+                        className="resolve-btn"
+                        onClick={() => updateTicketStatus(ticket._id)}
+                      >
+                        Mark Resolved
+                      </button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className="reports-section" id="reports">
+          <div className="section-top">
+            <div>
+              <h2>Reports</h2>
+              <p>Analytics and reporting can be extended next.</p>
+            </div>
           </div>
-        )}
-      </section>
 
-      <section className="tickets-section" id="reports">
-        <div className="section-header">
-          <h2>Reports</h2>
-        </div>
-
-        <div className="ticket-card">
-          <div>
-            <h3>Reporting module coming next</h3>
-            <p className="ticket-desc">
-              This section will include analytics, trends, ticket summaries,
-              and performance insights.
+          <div className="report-card">
+            <h3>Coming next</h3>
+            <p>
+              This section can be expanded with ticket trends, turnaround time,
+              priority breakdowns, and team performance metrics.
             </p>
           </div>
-        </div>
-      </section>
+        </section>
+      </main>
     </div>
   );
 }
