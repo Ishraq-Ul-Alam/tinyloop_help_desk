@@ -15,7 +15,7 @@ app.use(
       "http://localhost:5173",
       "https://tinyloop-help-desk.vercel.app",
     ],
-    methods: ["GET", "POST", "PUT", "OPTIONS"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
   })
 );
@@ -91,6 +91,24 @@ app.put("/api/tickets/:id", async (req, res) => {
   } catch (error) {
     console.error("Error updating ticket:", error.message);
     res.status(500).json({ message: "Failed to update ticket" });
+  }
+});
+
+app.delete("/api/tickets/:id", async (req, res) => {
+  try {
+    const deletedTicket = await Ticket.findByIdAndDelete(req.params.id);
+
+    if (!deletedTicket) {
+      return res.status(404).json({ message: "Ticket not found" });
+    }
+
+    res.json({
+      message: "Ticket deleted successfully",
+      ticket: deletedTicket,
+    });
+  } catch (error) {
+    console.error("Error deleting ticket:", error.message);
+    res.status(500).json({ message: "Failed to delete ticket" });
   }
 });
 
