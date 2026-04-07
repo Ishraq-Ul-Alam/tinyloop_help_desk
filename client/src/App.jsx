@@ -1,7 +1,19 @@
 import { useEffect, useState } from "react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+} from "recharts";
 
 function App() {
-  const API_BASE = "https://tinyloop-help-desk-2.onrender.com"; // replace this
+  const API_BASE = "https://.https://tinyloop-help-desk-2.onrender.com";
 
   const [formData, setFormData] = useState({
     title: "",
@@ -97,9 +109,38 @@ function App() {
     }
   };
 
+  const deleteTicket = async (id) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this ticket?");
+    if (!confirmDelete) return;
+
+    try {
+      await fetch(`${API_BASE}/api/tickets/${id}`, {
+        method: "DELETE",
+      });
+
+      setTickets((prev) => prev.filter((t) => t._id !== id));
+    } catch (err) {
+      console.error("Delete failed:", err);
+    }
+  };
+
   const filteredTickets = tickets
     .filter((t) => (filter === "All" ? true : t.status === filter))
     .filter((t) => t.title.toLowerCase().includes(search.toLowerCase()));
+
+  const statusData = [
+    { name: "Open", value: tickets.filter((t) => t.status === "Open").length },
+    { name: "Pending", value: tickets.filter((t) => t.status === "Pending").length },
+    { name: "Resolved", value: tickets.filter((t) => t.status === "Resolved").length },
+  ];
+
+  const priorityData = [
+    { name: "P1", value: tickets.filter((t) => t.priority === "P1").length },
+    { name: "P2", value: tickets.filter((t) => t.priority === "P2").length },
+    { name: "P3", value: tickets.filter((t) => t.priority === "P3").length },
+  ];
+
+  const pieColors = ["#2563eb", "#f59e0b", "#10b981"];
 
   return (
     <div className="app-shell">
@@ -119,8 +160,7 @@ function App() {
             <span className="badge">Smart Helpdesk SaaS</span>
             <h1>Support tickets, simplified for fast-moving teams.</h1>
             <p className="hero-description">
-              Create, track, resolve, and filter tickets through a clean full-stack
-              helpdesk workflow powered by React, Express, and MongoDB.
+              Create, track, resolve, filter, and report on tickets through a clean full-stack workflow.
             </p>
 
             <div className="hero-actions">
@@ -216,7 +256,7 @@ function App() {
           <div className="section-top">
             <div>
               <h2>Ticket Management</h2>
-              <p>Review, search, filter, and resolve tickets.</p>
+              <p>Review, search, filter, resolve, and delete tickets.</p>
             </div>
           </div>
 
@@ -274,14 +314,23 @@ function App() {
                       {ticket.status}
                     </span>
 
-                    {ticket.status !== "Resolved" && (
+                    <div className="ticket-actions">
+                      {ticket.status !== "Resolved" && (
+                        <button
+                          className="resolve-btn"
+                          onClick={() => updateTicketStatus(ticket._id)}
+                        >
+                          Mark Resolved
+                        </button>
+                      )}
+
                       <button
-                        className="resolve-btn"
-                        onClick={() => updateTicketStatus(ticket._id)}
+                        className="delete-btn"
+                        onClick={() => deleteTicket(ticket._id)}
                       >
-                        Mark Resolved
+                        Delete
                       </button>
-                    )}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -293,16 +342,43 @@ function App() {
           <div className="section-top">
             <div>
               <h2>Reports</h2>
-              <p>Analytics and reporting can be extended next.</p>
+              <p>Status and priority insights from your current ticket data.</p>
             </div>
           </div>
 
-          <div className="report-card">
-            <h3>Coming next</h3>
-            <p>
-              This section can be expanded with ticket trends, turnaround time,
-              priority breakdowns, and team performance metrics.
-            </p>
+          <div className="reports-grid">
+            <div className="report-card chart-card">
+              <h3>Tickets by Status</h3>
+              <ResponsiveContainer width="100%" height={280}>
+                <BarChart data={statusData}>
+                  <XAxis dataKey="name" />
+                  <YAxis allowDecimals={false} />
+                  <Tooltip />
+                  <Bar dataKey="value" radius={[8, 8, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="report-card chart-card">
+              <h3>Tickets by Priority</h3>
+              <ResponsiveContainer width="100%" height={280}>
+                <PieChart>
+                  <Pie
+                    data={priorityData}
+                    dataKey="value"
+                    nameKey="name"
+                    outerRadius={90}
+                    label
+                  >
+                    {priorityData.map((entry, index) => (
+                      <Cell key={entry.name} fill={pieColors[index % pieColors.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </section>
       </main>
